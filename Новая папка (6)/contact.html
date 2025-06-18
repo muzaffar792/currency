@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Us</title>
+  <style>
+    :root {
+      --bg: #ffffff; --text: #000000; --card: #f0f0f0; --accent: #272727;
+    }
+    [data-theme="dark"] {
+      --bg: #121212; --text: #ffffff; --card: #1f1f1f; --accent: #7e7e86;
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      transition: background .3s, color .3s;
+    }
+    nav {
+      background: var(--accent);
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    nav h1 { color: #fff; font-size: 1.2rem; }
+    .theme-toggle {
+      background: none; border: none; color: #fff; font-size:1.2rem;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h2 { margin-bottom: 20px; color: var(--accent); }
+    form {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 8px;
+    }
+    .form-group { margin-bottom: 15px; }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      background: var(--bg);
+      color: var(--text);
+    }
+    textarea { resize: vertical; min-height: 120px; }
+    button.submit {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button.submit:hover {
+      opacity: 0.9;
+    }
+    .info {
+      margin-top: 30px;
+      line-height: 1.6;
+    }
+    .info a { color: var(--accent); text-decoration: none; }
+    .info a:hover { text-decoration: underline; }
+    footer {
+      text-align: center;
+      margin: 40px 0 20px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    @media(max-width:600px){
+      h2 { font-size:1.5rem; }
+      .container { margin:20px auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <h1>CurrencyX</h1>
+    <button id="themeToggle" class="theme-toggle">🌙</button>
+  </nav>
+
+  <div class="container">
+    <h2>Contact Us</h2>
+    <form id="contactForm">
+      <div class="form-group">
+        <label for="name">Your Name</label>
+        <input type="text" id="name" placeholder="Enter your name" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Your Email</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+      </div>
+      <div class="form-group">
+        <label for="message">Your Message</label>
+        <textarea id="message" placeholder="How can we help you?" required></textarea>
+      </div>
+      <button type="submit" class="submit">Send Message</button>
+    </form>
+
+    <div class="info">
+      <p>Or reach us directly at:</p>
+      <p>Email: <a href="mailto:support@currencyx.com">support@currencyx.com</a></p>
+      <p>Phone: <a href="tel:+1234567890">+1 (234) 567‑890</a></p>
+      <p>Follow us on:</p>
+      <p>
+        <a href="#" target="_blank">Twitter</a> |
+        <a href="#" target="_blank">Facebook</a> |
+        <a href="#" target="_blank">LinkedIn</a>
+      </p>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 CurrencyX. All rights reserved.
+  </footer>
+
+  <script>
+    // Theme toggle
+    const themeToggle = document.getElementById("themeToggle");
+    const savedTheme = localStorage.getItem("theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+    themeToggle.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+
+    themeToggle.addEventListener("click", () => {
+      const curr = document.documentElement.getAttribute("data-theme");
+      const next = curr === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("theme", next);
+      themeToggle.textContent = next === "dark" ? "☀️" : "🌙";
+    });
+
+    // Form submit handler
+    document.getElementById("contactForm").addEventListener("submit", e => {
+      e.preventDefault();
+      alert("Thank you, your message has been sent!");
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>

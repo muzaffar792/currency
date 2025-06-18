@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CurrencyX</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #000000;
+      --card: #f0f0f0;
+      --accent: #272727;
+    }
+
+    [data-theme="dark"] {
+      --bg: #121212;
+      --text: #ffffff;
+      --card: #1f1f1f;
+      --accent: #212023;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      transition: all 0.3s ease;
+    }
+
+    .navbar {
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .nav-title {
+      margin: 0;
+      color: #fff;
+      font-size: 1.5rem;
+    }
+
+    .theme-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--card);
+      color: var(--text);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+
+    .theme-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .theme-btn .icon {
+      transition: transform 0.3s;
+    }
+
+    [data-theme="dark"] .theme-btn .icon {
+      transform: rotate(180deg);
+    }
+
+    .burger-container {
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .burger-container svg {
+      transition: transform 0.3s;
+    }
+
+    .menu {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 70%;
+      height: 100%;
+      background: var(--accent);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: right 0.4s ease;
+      z-index: 1000;
+      box-shadow: -4px 0 10px rgba(0, 0, 0, 0.6);
+      border-left: 1px solid #333;
+    }
+
+    .menu.show {
+      right: 0;
+    }
+
+    .menu a {
+      color: white;
+      font-size: 1.3rem;
+      padding: 15px;
+      text-decoration: none;
+      text-align: center;
+      width: 100%;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .container {
+      margin-top: 40px;
+      width: 90%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .currency-img {
+      width: 200px;
+      margin-bottom: 30px;
+    }
+
+    .input-group {
+      display: flex;
+      width: 100%;
+      margin-bottom: 20px;
+      border-radius: 15px;
+      overflow: hidden;
+      background-color: var(--card);
+    }
+
+    .input-group input,
+    .input-group select {
+      flex: 1;
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+    }
+
+    .switch {
+      font-size: 24px;
+      margin: 5px 0 20px;
+      color: var(--text);
+      cursor: pointer;
+    }
+    @media (min-width: 768px) {
+      .menu {
+        width: 20%;
+        right: -20%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <button id="themeToggle" class="theme-btn">
+      <span class="icon">🌙</span>
+      <span class="label">Night Mode</span>
+    </button>
+    <h1 class="nav-title">CurrencyX</h1>
+    <div class="burger-container" onclick="toggleMenu()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 100 100" fill="#fff">
+        <rect width="100" height="10" y="10" rx="5"></rect>
+        <rect width="100" height="10" y="40" rx="5"></rect>
+        <rect width="100" height="10" y="70" rx="5"></rect>
+      </svg>
+    </div>
+  </nav>
+
+  <!-- Slide-out menu -->
+  <!-- Right-side Menu -->
+<div id="menu" class="menu">
+   <a href="./index.html">Public currency $</a>
+   <a href="./crypto-currency.html">Crypto currency ⟠</a>
+   <a href="./telegram-crypto.html">Telegram mini Crypto</a>
+   <a href="./icons.html">Currency icons</a>
+   <a href="./canculator.html">Calculator</a>
+   <a href="./aboute.html">About</a>
+   <a href="./contact.html">Contact</a>
+   <a href="./settings.html">Settings</a>
+</div>
+
+
+  <!-- Main content -->
+  <div class="container">
+    <img src="./imagines/image-removebg-preview (2).png" class="currency-img" alt="currency icon" />
+
+    <div class="input-group">
+      <input type="number" id="amount1" placeholder="0.00" />
+      <select id="currency1"></select>
+    </div>
+
+    <div class="switch" onclick="switchCurrencies()">⇅</div>
+
+    <div class="input-group">
+      <input type="number" id="amount2" placeholder="0.00" disabled />
+      <select id="currency2"></select>
+    </div>
+  </div>
+
+  <script>
+    // Menu toggle
+    function toggleMenu() {
+      document.getElementById('menu').classList.toggle('show');
+    }
+
+    // Theme toggle
+    const btn = document.getElementById('themeToggle');
+    const icon = btn.querySelector('.icon');
+    const label = btn.querySelector('.label');
+    const saved = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    updateBtn(saved);
+
+    btn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateBtn(next);
+    });
+
+    function updateBtn(theme) {
+      if (theme === 'dark') {
+        icon.textContent = '☀️';
+        label.textContent = 'Light Mode';
+      } else {
+        icon.textContent = '🌙';
+        label.textContent = 'Night Mode';
+      }
+    }
+
+    // Currency converter
+    const currencies = [
+      "USD", "EUR", "GBP", "RUB", "AED", "CNY", "JPY", "INR", "CAD", "AUD",
+      "CHF", "SEK", "NOK", "DKK", "SGD", "HKD", "TRY", "THB", "KZT", "MYR", "PKR",
+      "IDR", "EGP", "ILS", "NGN", "ZAR", "MXN", "KRW", "TWD", "PLN", "CZK", "HUF",
+      "SAR", "BRL", "ARS", "UAH", "IQD", "IRR", "BDT", "VND", "MAD", "DZD", "QAR",
+      "OMR", "BHD", "KWD", "LKR", "NPR", "ETB", "XOF", "XAF", "GHS"
+    ];
+
+    const currency1 = document.getElementById("currency1");
+    const currency2 = document.getElementById("currency2");
+    const amount1 = document.getElementById("amount1");
+    const amount2 = document.getElementById("amount2");
+
+    currencies.forEach(curr => {
+      currency1.add(new Option(curr, curr));
+      currency2.add(new Option(curr, curr));
+    });
+
+    currency1.value = "UZS";
+    currency2.value = "USD";
+
+    const API_KEY = "fca_live_1Ev0DkNxq4j4wN3WFqXd799KeypKcX60RbRugCGR";
+
+    async function convert() {
+      const from = currency1.value;
+      const to = currency2.value;
+      const amount = parseFloat(amount1.value);
+
+      if (!amount || isNaN(amount)) {
+        amount2.value = '';
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://api.freecurrencyapi.com/v1/latest?apikey=${API_KEY}&base_currency=${from}`);
+        const data = await response.json();
+        const rate = data.data[to];
+        if (rate) {
+          amount2.value = (amount * rate).toFixed(2);
+        } else {
+          amount2.value = 'Xatolik';
+        }
+      } catch (error) {
+        console.error('API xatolik:', error);
+        amount2.value = 'Xatolik';
+      }
+    }
+
+    function switchCurrencies() {
+      const temp = currency1.value;
+      currency1.value = currency2.value;
+      currency2.value = temp;
+      convert();
+    }
+
+    amount1.addEventListener("input", convert);
+    currency1.addEventListener("change", convert);
+    currency2.addEventListener("change", convert);
+
+    convert(); // initial load
+  </script>
+</body>
+</html>
