@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0d1117;
+      --text-dark: #ffffff;
+      --card-dark: #161b22;
+      --bg-light: #ffffff;
+      --text-light: #000000;
+      --card-light: #f4f4f4;
+      --accent: #3b82f6;
+      --radius: 12px;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      padding: 16px;
+      transition: 0.3s;
+    }
+    [data-theme="light"] body {
+      background: var(--bg-light);
+      color: var(--text-light);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .toggle-btn {
+      padding: 8px 16px;
+      background: var(--accent);
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #search {
+      width: 100%;
+      padding: 10px;
+      margin: 12px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      background: var(--card-dark);
+      padding: 12px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    [data-theme="light"] .card {
+      background: var(--card-light);
+    }
+    .card h4 {
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .price {
+      font-weight: bold;
+    }
+    .change.up { color: #16c784; }
+    .change.down { color: #ea3943; }
+    canvas {
+      width: 100%!important;
+      height: 40px!important;
+    }
+    #modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    #modal .inner {
+      background: var(--card-dark);
+      padding: 20px;
+      border-radius: var(--radius);
+      width: 90%;
+      max-width: 500px;
+    }
+    [data-theme="light"] #modal .inner {
+      background: var(--card-light);
+    }
+    .close {
+      float: right;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    #modal canvas {
+      height: 200px!important;
+      width: 100%!important;
+    }
+    .controls {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .controls select {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .header-bar {
+  display: flex;
+  align-items: center;
+  padding: 05px 10px;
+  background-color: var(--bg);
+  border-bottom: 1px solid var(--border);
+  gap: 20px;
+}
+
+.back-btn {
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.back-btn:hover {
+  background-color: var(--accent-dark);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text);
+  margin: 0;
+}
+
+    @media(max-width: 600px){
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header-bar">
+       <button onclick="window.location.href='./index.html'" class="back-btn">← Back</button>
+  </header>
+
+  <div class="header">
+    <h2>Crypto Tracker</h2>
+    <button class="toggle-btn" onclick="toggleTheme()">Dark/Light</button>
+  </div>
+
+  <input type="text" id="search" placeholder="Search crypto...">
+ 
+  <div class="grid" id="cryptoGrid"></div>
+
+  <div id="modal" onclick="closeModal()">
+    <div class="inner" onclick="event.stopPropagation()">
+      <span class="close" onclick="closeModal()">✕</span>
+      <canvas id="modalChart"></canvas>
+      <div class="controls">
+        <select id="currencySelect">
+          <option value="USD">USD</option>
+        </select>
+        <div id="priceInfo"></div>
+      </div>
+    </div>
+  </div>
+ 
+
+  <script>
+  const apiKey = "69bb80b88505bff58137fe4fef0e68c526a6d8bb4c996b46940d7983e0f92822";
+  let list = [], currentSymbol = '', chart;
+  const theme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+
+  const grid = document.getElementById("cryptoGrid"),
+        searchInput = document.getElementById("search"),
+        modal = document.getElementById("modal"),
+        chartCanvas = document.getElementById("modalChart"),
+        currencySelect = document.getElementById("currencySelect"),
+        priceInfo = document.getElementById("priceInfo");
+
+  function toggleTheme(){
+    const doc = document.documentElement;
+    const newTheme = doc.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    doc.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  }
+
+  async function getList() {
+    const res = await fetch(`https://min-api.cryptocompare.com/data/top/mktcapfull?limit=50&tsym=USD&api_key=${apiKey}`);
+    const data = await res.json();
+    list = data.Data;
+    renderList(list);
+  }
+
+  async function renderList(arr) {
+    grid.innerHTML = '';
+    for (const c of arr) {
+      const coin = c.CoinInfo;
+      const raw = c.RAW?.USD;
+      if (!raw) continue;
+
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <h4>${coin.FullName} (${coin.Name})</h4>
+        <div class="price">$${raw.PRICE.toFixed(2)}</div>
+        <div class="change ${raw.CHANGEPCT24HOUR >= 0 ? 'up' : 'down'}">${raw.CHANGEPCT24HOUR.toFixed(2)}%</div>
+        <canvas id="mini-${coin.Name}" height="40"></canvas>`;
+      div.onclick = () => openModal(coin.Name);
+      grid.appendChild(div);
+
+      // 🟢 Mini grafik uchun API so‘rov:
+      try {
+        const r = await fetch(`https://min-api.cryptocompare.com/data/v2/histohour?fsym=${coin.Name}&tsym=USD&limit=24&api_key=${apiKey}`);
+        const json = await r.json();
+        const data = json.Data.Data.map(p => p.close);
+        const ctx = document.getElementById(`mini-${coin.Name}`).getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.map((_, i) => i),
+            datasets: [{
+              data,
+              borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent'),
+              borderWidth: 1,
+              fill: false,
+              tension: 0.3
+            }]
+          },
+          options: {
+            elements: { point: { radius: 0 } },
+            scales: { x: { display: false }, y: { display: false } },
+            plugins: { legend: { display: false } },
+            maintainAspectRatio: false
+          }
+        });
+      } catch (e) {
+        console.error("Mini chart error for", coin.Name);
+      }
+    }
+  }
+
+  async function openModal(symbol){
+    currentSymbol = symbol;
+    modal.style.display = 'flex';
+    currencySelect.value = 'USD';
+    await updateModal();
+  }
+
+  async function updateModal(){
+    const cur = currencySelect.value;
+    const url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${currentSymbol}&tsym=${cur}&limit=30&api_key=${apiKey}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const prices = data.Data.Data;
+    const labels = prices.map(p => new Date(p.time * 1000).toLocaleDateString());
+    const values = prices.map(p => p.close);
+    const ctx = chartCanvas.getContext('2d');
+    if(chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: `${currentSymbol} Price`,
+          data: values,
+          borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent'),
+          fill: false,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: false } },
+        plugins: { legend: { display: true } }
+      }
+    });
+
+    const priceRes = await fetch(`https://min-api.cryptocompare.com/data/price?fsym=${currentSymbol}&tsyms=USD,EUR&api_key=${apiKey}`);
+    const priceData = await priceRes.json();
+    const symbol = cur === 'USD' ? '$' : cur === 'EUR' ? '€' : '';
+    priceInfo.textContent = `Price: ${symbol}${priceData[cur]}`;
+  }
+
+  function closeModal(){
+    modal.style.display = 'none';
+    if(chart) chart.destroy();
+  }
+
+  searchInput.addEventListener('input', () => {
+    const val = searchInput.value.toLowerCase();
+    renderList(list.filter(c => c.CoinInfo.FullName.toLowerCase().includes(val) || c.CoinInfo.Name.toLowerCase().includes(val)));
+  });
+
+  currencySelect.addEventListener('change', updateModal);
+  getList();
+  setInterval(getList, 60000);
+  
+   function goBack() {
+    window.history.back();
+  }
+</script>
+<!-- Removed duplicate theme variable declaration to prevent redeclaration error -->
+
+</body>
+</html>

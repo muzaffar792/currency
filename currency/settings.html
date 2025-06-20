@@ -1,0 +1,173 @@
+<!-- settings.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Settings Page</title>
+  <style>
+    :root {
+      --bg-color: #f9f9f9;
+      --text-color: #1a1a1a;
+    }
+    body.light {
+      --bg-color: #f9f9f9;
+      --text-color: #1a1a1a;
+    }
+    body.dark {
+      --bg-color: #1a1a1a;
+      --text-color: #f9f9f9;
+    }
+    body.blue {
+      --bg-color: #e0f2ff;
+      --text-color: #003366;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .card h2 {
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .form-control {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    select, input[type=checkbox] {
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .back-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    @media (max-width: 600px) {
+      .form-control {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      select {
+        width: 100%;
+        margin-top: 0.5rem;
+      }
+    }
+  </style>
+  <button class="back-btn" onclick="window.location.href='./index.html'">Back</button>
+</head>
+<body class="light">
+  <div class="container">
+    <h1 style="text-align:center;">Settings</h1>
+
+    <div class="card">
+      <h2>Theme</h2>
+      <div class="form-control">
+        <label for="theme">Select Theme:</label>
+        <select id="theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="blue">Blue</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Language</h2>
+      <div class="form-control">
+        <label for="language">Select Language:</label>
+        <select id="language">
+          <option value="en">English</option>
+          <option value="uz">Uzbek</option>
+          <option value="ru">Russian</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Notifications</h2>
+      <div class="form-control">
+        <label for="email-notif">Email Notifications</label>
+        <input type="checkbox" id="email-notif" checked />
+      </div>
+      <div class="form-control">
+        <label for="push-notif">Push Notifications</label>
+        <input type="checkbox" id="push-notif" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const themeSelect = document.getElementById('theme');
+  const languageSelect = document.getElementById('language');
+
+  // ⏪ Saqlangan theme-ni qo‘llash (sahifa ochilganda)
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.body.className = savedTheme;
+  themeSelect.value = savedTheme;
+
+  // 🔁 Theme tanlanganda saqlash
+  themeSelect.addEventListener('change', (e) => {
+    const selectedTheme = e.target.value;
+    document.body.className = selectedTheme;
+    localStorage.setItem('theme', selectedTheme);
+  });
+
+  // 🌐 Til o‘zgarganda (faqat ko‘rsatish)
+  languageSelect.addEventListener('change', (e) => {
+    const lang = e.target.value;
+    alert('Language changed to: ' + lang.toUpperCase());
+    // Bu yerda tilni almashtirish funksiyasini yozish mumkin
+    localStorage.setItem('language', lang); // optional
+  });
+
+  // 🔔 Notifikatsiyalarni saqlash (optional)
+  document.getElementById('email-notif').addEventListener('change', (e) => {
+    localStorage.setItem('emailNotif', e.target.checked);
+  });
+
+  document.getElementById('push-notif').addEventListener('change', (e) => {
+    localStorage.setItem('pushNotif', e.target.checked);
+  });
+
+  // ⏪ Avvalgi notification holatlarini tiklash
+  document.getElementById('email-notif').checked = localStorage.getItem('emailNotif') === 'true';
+  document.getElementById('push-notif').checked = localStorage.getItem('pushNotif') === 'true';
+</script>
+<script>
+  const theme = localStorage.getItem('theme') || 'light';
+  document.body.className = theme;
+</script>
+
+</body>
+</html>
+
